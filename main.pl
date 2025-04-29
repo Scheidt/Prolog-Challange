@@ -1,69 +1,82 @@
 :- dynamic q/2.
 
-recomendacao(magicka2) :-
-        is_true("prefere RPG"),
-        is_true("prefere jogo de tiro"),
-        is_true("o jogo deve possuir multiplayer"),
-        is_true("deve ser desafiador").
-
-recomendacao(borderlands2) :-
-        is_true("prefere RPG"),
-        is_true("prefere jogo de tiro"),
-        is_true("o jogo deve possuir multiplayer").
-
-recomendacao(cyberpunk2077) :-
-        is_true("prefere RPG"),
-        is_true("prefere jogo de tiro"),
-        is_true("deve ser desafiador").
-
 recomendacao(fallout4) :-
         is_true("prefere RPG"),
-        is_true("prefere jogo de tiro").
+        is_true("prefere jogo de tiro"),
+        is_false("o jogo deve possuir multiplayer"),
+        is_false("deve ser desafiador").
 
 recomendacao(divinityoriginalsinii) :-
         is_true("prefere RPG"),
+        is_false("prefere jogo de tiro"),
         is_true("o jogo deve possuir multiplayer"),
         is_true("deve ser desafiador").
 
 recomendacao(diabloiii) :-
         is_true("prefere RPG"),
-        is_true("o jogo deve possuir multiplayer").
+        is_false("prefere jogo de tiro"),
+        is_true("o jogo deve possuir multiplayer"),
+        is_false("deve ser desafiador").
 
 recomendacao(thewitcher3) :-
         is_true("prefere RPG"),
+        is_false("prefere jogo de tiro"),
+        is_false("o jogo deve possuir multiplayer"),
         is_true("deve ser desafiador").
 
 recomendacao(skyrim) :-
-        is_true("prefere RPG").
+        is_true("prefere RPG"),
+        is_false("prefere jogo de tiro"),
+        is_false("o jogo deve possuir multiplayer"),
+        is_false("deve ser desafiador").
 
 recomendacao(escapefromtarkov) :-
+        is_false("prefere RPG"),
         is_true("prefere jogo de tiro"),
         is_true("o jogo deve possuir multiplayer"),
         is_true("deve ser desafiador").
 
 recomendacao(marvelrivals) :-
+        is_false("prefere RPG"),
         is_true("prefere jogo de tiro"),
-        is_true("o jogo deve possuir multiplayer").
+        is_true("o jogo deve possuir multiplayer"),
+        is_false("deve ser desafiador").
 
 recomendacao(intravenousii) :-
+        is_false("prefere RPG"),
         is_true("prefere jogo de tiro"),
+        is_false("o jogo deve possuir multiplayer"),
         is_true("deve ser desafiador").
 
 recomendacao(hitman) :-
-        is_true("prefere jogo de tiro").
+        is_false("prefere RPG"),
+        is_true("prefere jogo de tiro"),
+        is_false("o jogo deve possuir multiplayer"),
+        is_false("deve ser desafiador").
 
 recomendacao(bloonstd6) :-
+        is_false("prefere RPG"),
+        is_false("prefere jogo de tiro"),
         is_true("o jogo deve possuir multiplayer"),
         is_true("deve ser desafiador").
 
 recomendacao(minecraft) :-
-        is_true("o jogo deve possuir multiplayer").
+        is_false("prefere RPG"),
+        is_false("prefere jogo de tiro"),
+        is_true("o jogo deve possuir multiplayer"),
+        is_false("deve ser desafiador").
 
 recomendacao(celeste) :-
+        is_false("prefere RPG"),
+        is_false("prefere jogo de tiro"),
+        is_false("o jogo deve possuir multiplayer"),
         is_true("deve ser desafiador").
 
-% Todos os requisitos “Não” na tabela
-recomendacao(oneshot).
+recomendacao(oneshot) :-
+        is_false("prefere RPG"),
+        is_false("prefere jogo de tiro"),
+        is_false("o jogo deve possuir multiplayer"),
+        is_false("deve ser desafiador").
 
 
 
@@ -104,12 +117,15 @@ resultado :- clean, recomendacao(X),
       ).
 
 
-is_true(Q) :-
-        not(q(Q,X)),
-        format("~s? (digite 'sim' para sim, quaisquer outro texto será considerado como 'não')\n", [Q]),
-        read(X),
-        assert(q(Q,X)),
-        X = sim, !;
-        q(Q,sim).
+ask(Q) :-
+    q(Q,_), !.  % já respondido, não pergunta de novo
+ask(Q) :-
+    format("~s? (digite 'sim' para sim, ou 'nao' para não)\n", [Q]),
+    read(X),
+    (X = sim -> assert(q(Q,sim)) ; assert(q(Q,nao))).
 
+is_true(Q) :- ask(Q), q(Q,sim).
+is_false(Q) :- ask(Q), q(Q,nao).
+
+% Limpa todas as respostas
 clean :- retractall(q(_,_)).
